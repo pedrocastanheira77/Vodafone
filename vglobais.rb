@@ -1,65 +1,54 @@
-class Info
+require_relative "vfuncoes.rb"
 
+class Globais
   def initialize(tipo, generico, ficheiros)
     @tipo = tipo
     @generico = generico
     @ficheiros = ficheiros
   end
 
-  def calcula_linhas
-    fileObj = File.open(@ficheiros[0])
-    count = fileObj.read.count("\n") - 3     #  3 = linhas do cabeçalho
-    fileObj.close
-    return count
-  end
-
-  def prepara_colunas_ref(ficheiro)
-    dados = leituras(ficheiro)
-    colunas_ref = []
-    for i in 0...calcula_linhas
+  def prepara_colunas_ref
+      ficheiro = LeFicheiro.new("#{@ficheiros[0]}", 3)
+      dados = ficheiro.leitura
+      colunas_ref = []
       linha = []
-      for j in 0..4
-        linha.push(dados[i][j])
+      
+      for j in 0..4 # Cabecalho
+        linha.push(dados[0][j])
       end
       colunas_ref.push(linha)
-    end
-    colunas_ref
+
+      for i in 1...dados.size # Entradas
+        linha = []
+        for j in 0..4
+          linha.push(dados[i][j]) if (j==0 || j==4)
+          linha.push(dados[i][j].sub(/,/,".").to_i) if (j == 1 || j==2 || j==3)
+        end
+        colunas_ref.push(linha)
+      end
+      colunas_ref
   end
 
-  def leituras(ficheiro)
-    num_leituras = calcula_linhas
-    fileObj = File.open(ficheiro)
-    3.times do
-      fileObj.gets.split("\n")
+  def prepara_colunas_medicoes(ficheiro)
+    ficheiro = LeFicheiro.new(ficheiro, 3)
+    dados = ficheiro.leitura
+    for i in 0...dados.size
+      6.times do
+        dados[i].shift
+      end
     end
-    linhas=[]
-    for i in 0...num_leituras
-      entrada = fileObj.gets.split("\n")
-      entrada = entrada[0].split(";")
-      linhas.push(entrada)
-    end
-    fileObj.close
-    return linhas
-  end
-
-  def calculo_numero_de_indicadores(ficheiro)
-    colunas = leituras(ficheiro)
-    num_colunas = colunas[0].size - 5      # 5 = colunas estáticas - dia mes ano horas minutos
-    num_colunas
-  end
-
-  def prepara_colunas_medicoes(dados, ficheiro)
-    indicadores = calculo_numero_de_indicadores(ficheiro)
+    indicadores = dados[0].size
     colunas = []
     linha = []
-    for j in 5...(5+indicadores)
+
+    for j in 0...indicadores
       linha.push(dados[0][j])
     end
     colunas.push(linha)
 
-    for i in 1...calcula_linhas
+    for i in 1...dados.size
       linha = []
-      for j in 5...(5+indicadores)
+      for j in 0...indicadores
         linha.push(dados[i][j].sub(/,/,".").to_f)
       end
       colunas.push(linha)
@@ -67,62 +56,29 @@ class Info
     colunas
   end
 
-  def cria_novo_csv(tab, num_colunas_tab)
-    num_linhas = calcula_linhas
-    File.delete("analise_#{@generico}.csv") if File.exist?("analise_#{@generico}.csv")
-    fileObj = File.new("analise_#{@generico}.csv", 'a+')
-    File.open("analise_#{@generico}.csv",'a') do |linha|
-      for i in 0...num_linhas
-        for j in 0...num_colunas_tab-1
-          linha.write("#{tab[i][j]};")
-        end
-        linha.write("#{tab[i][num_colunas_tab-1]}\n")
-      end
-    end
-    fileObj.close
-  end
-
   def core
-    num_linhas = calcula_linhas
-    colunas_ref = prepara_colunas_ref(@ficheiros[0])
-    tab = Array.new(colunas_ref)
+    colunas_ref = prepara_colunas_ref
+    tabela = Array.new(colunas_ref)
     for num_ficheiros in 0...@ficheiros.size
       colunas_medicoes = []
-      dados = leituras(@ficheiros[num_ficheiros])
-      colunas_medicoes = prepara_colunas_medicoes(dados, @ficheiros[num_ficheiros])
-        for i in 0...num_linhas
-          tab[i].concat(colunas_medicoes[i])
+      colunas_medicoes = prepara_colunas_medicoes(@ficheiros[num_ficheiros])
+        for i in 0...colunas_ref.size
+          tabela[i].concat(colunas_medicoes[i])
         end
     end
-    num_colunas_tab = tab[0].size
-    cria_novo_csv(tab, num_colunas_tab)
+    EscreveFicheiro.cria_csv(tabela, "ficheiros gerados/1_analise_#{@generico}.csv")
   end
 
 end
 
-global = Info.new(
-  "global",
-  "consumo_global",
-  ["ea+_dtcs_K_15_minutes_realtime_with_components_from_2016_04_01_to_2016_09_30.csv", 
-  "ea+_omcs_K_15_minutes_realtime_with_components_from_2016_04_01_to_2016_09_30.csv"
-  ]
-  )
-global.core
-
-avac = Info.new(
-  "AVAC",
-  "avac",
-  ["ea+_avac_dtcs_K_15_minutes_realtime_with_components_from_2016_04_01_to_2016_09_30.csv",
-  "ea+_avac_omcs_K_15_minutes_realtime_with_components_from_2016_04_01_to_2016_09_30.csv"
-  ]
-  )
-avac.core
-
-it = Info.new(
-  "IT",
-  "IT",
-  ["ea+_it_dtcs_K_15_minutes_realtime_with_components_from_2016_01_01_to_2016_09_30.csv",
-  "ea+_it_omcs_K_15_minutes_realtime_with_components_from_2016_01_01_to_2016_09_30.csv"
-  ]
-  )
-it.core
+def corre_vglobais(fich_globais, fich_avac, fich_it)
+  global = Globais.new("global", "consumo_global", fich_globais)
+  global.core
+  puts "status..33%"
+  avac = Globais.new("AVAC", "avac", fich_avac)
+  avac.core
+  puts "status..66%"
+  it = Globais.new("IT", "it", fich_it)
+  it.core
+  puts "status..100%"
+end

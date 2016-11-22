@@ -1,7 +1,6 @@
 class Site
 
-  def initialize(site, ficheiro, indicadores)
-    @site = site
+  def initialize(ficheiro, indicadores)
     @ficheiro = ficheiro
     @indicadores = indicadores
   end
@@ -13,7 +12,7 @@ class Site
     ["EA+ QGD 1 ALF2A1 (KWh)"],
     ["EA+ Geral ALF2A7+A8 (KWh)"],
     ["EA+ GERAL 1 BVTP1 (KWh)", "EA+ GERAL 2 BVTP1 (KWh)"],
-    ["EA+ GERAL 1 BVTP0 (KWh)","EA+ QGD2 BVTP0 (KWh)"],
+    ["EA+ BVTP0 (KWh)"],
     ["EA+ GERAL AVR (KWh)"],
     ["EA+ GERAL CMB (KWh)"],
     ["EA+ GERAL FAR (KWh)"],
@@ -26,16 +25,58 @@ class Site
     ["EA+ GERAL 1 RAN (KWh)", "EA+ GERAL 2 RAN (KWh)"]
     ]
   end
+
+  def self.indicators_groups_avac  
+    [
+    ["EA+ AVAC IT ALF1P0 (KWh)"],
+    ["EA+ AVAC IT ALF1P-1 (KWh)"],
+    ["EA+ AVAC IT ALF2A1 (KWh)"],
+    ["EA+ AVAC IT ALF2A7+A8 (KWh)"],
+    ["EA+ AVAC IT BVTP1 (KWh)"],
+    ["EA+ AVAC IT BVTP0 (KWh)"],
+    ["EA+ AVAC AVR (KWh)"],
+    ["EA+ AVAC CMB (KWh)"],
+    ["EA+ AVAC IT FAR (KWh)"],
+    ["EA+ AVAC FMC (KWh)"],
+    ["EA+ AVAC FNC (KWh)"],
+    ["EA+ AVAC IT MAT (KWh)"],
+    ["EA+ AVAC PDG (KWh)"],
+    ["EA+ AVAC IT PTM (KWh)"],
+    ["EA+ AVAC IT SNT (KWh)"],
+    ["EA+ AVAC RAN (KWh)"]
+    ]
+  end
   
+  def self.indicators_groups_it
+    [
+    ["EA+ IT ALF1P0 (KWh)"],
+    ["EA+ IT ALF1P-1 (KWh)"],
+    ["EA+ IT ALF2A1 (KWh)"],
+    ["EA+ IT ALF2A7+A8 (KWh)"],
+    ["EA+ IT BVTP1 (KWh)"],
+    ["EA+ IT BVTP0 (KWh)"],
+    ["EA+ IT AVR (KWh)"],
+    ["EA+ IT CMB (KWh)"],
+    ["EA+ IT FAR (KWh)"],
+    ["EA+ IT FMC (KWh)"],
+    ["EA+ IT FNC (KWh)"],
+    ["EA+ IT MAT (KWh)"],
+    ["EA+ IT PDG (KWh)"],
+    ["EA+ IT PTM (KWh)"],
+    ["EA+ IT SNT (KWh)"],
+    ["EA+ IT RAN (KWh)"]
+    ]
+  end
+
   def calcula_linhas
-    fileObj = File.open("analise_#{@ficheiro}.csv")
+    fileObj = File.open("ficheiros gerados/1_analise_#{@ficheiro}.csv")
     count = fileObj.read.count("\n")
     fileObj.close
     return count
   end
 
   def get_index
-    fileObj = File.open("analise_#{@ficheiro}.csv")
+    fileObj = File.open("ficheiros gerados/1_analise_#{@ficheiro}.csv")
     cabecalho = fileObj.gets.chomp
     cabecalho = cabecalho.split(";")
     index_table = []
@@ -45,23 +86,9 @@ class Site
     index_table
   end
 
-  def prepara_colunas_ref
-    num_leituras = calcula_linhas
-    dados = leituras
-    colunas_ref = []
-    for i in 0...num_leituras
-      linha = []
-      for j in 0..4
-        linha.push(dados[i][j])
-      end
-      colunas_ref.push(linha)
-    end
-    colunas_ref
-  end
-
   def leituras
     num_leituras = calcula_linhas
-    fileObj = File.open("analise_#{@ficheiro}.csv")
+    fileObj = File.open("ficheiros gerados/1_analise_#{@ficheiro}.csv")
     linhas=[]
     for i in 0...num_leituras
       entrada = fileObj.gets.split("\n")
@@ -80,7 +107,7 @@ class Site
     linha = []
     for j in 0...index_table.size
         index = index_table[j]
-        linha.push(dados[0][index])
+        linha.push(dados[0][index])        
     end 
     colunas.push(linha)    
     for i in 1...num_leituras 
@@ -94,12 +121,76 @@ class Site
     colunas
   end
 
-  def cria_novo_csv(tab)
-    index_table = get_index
+  def trata_informacao
+    tab = prepara_colunas_medicoes
+    if @indicadores.size > 1
+      array_soma = []
+      array_soma[0] = ["EA+ Geral (kWh)"]
+      for i in 1...tab.size
+        linha = []
+        res = 0
+        for j in 0...tab[0].size
+          res += tab[i][j]
+        end
+        linha.push(res)
+        array_soma.push(linha)
+      end
+      return array_soma
+    elsif @indicadores.size == 1
+      array_soma = Array.new(tab)
+      return array_soma
+    end
+  end
+
+end
+
+class Contatena
+
+  def initialize(site, pacote_info, ficheiro)
+    @site = site
+    @pacote_info = pacote_info
+    @ficheiro = ficheiro
+  end
+
+  def calcula_linhas
+    fileObj = File.open("ficheiros gerados/1_analise_consumo_global.csv")
+    count = fileObj.read.count("\n")
+    fileObj.close
+    return count
+  end
+
+  def leituras_colunas_ref
     num_leituras = calcula_linhas
-    File.delete("site_#{@site}.csv") if File.exist?("site_#{@site}.csv")
-    fileObj = File.new("site_#{@site}.csv", 'a+')
-    File.open("site_#{@site}.csv",'a') do |linha|
+    fileObj = File.open("ficheiros gerados/1_analise_consumo_global.csv")
+    linhas=[]
+    for i in 0...num_leituras
+      entrada = fileObj.gets.split("\n")
+      entrada = entrada[0].split(";")
+      linhas.push(entrada)
+    end
+    fileObj.close
+    linhas
+  end
+
+  def prepara_colunas_ref   # como referência usa-se o ficheiro dos consumos globais para obter as colunas fixas (data, hora, ...)
+    num_leituras = calcula_linhas
+    dados = leituras_colunas_ref
+    colunas_ref = []
+    for i in 0...num_leituras
+      linha = []
+      for j in 0..4
+        linha.push(dados[i][j])
+      end
+      colunas_ref.push(linha)
+    end
+    colunas_ref
+  end
+
+  def cria_novo_csv(tab)
+    num_leituras = calcula_linhas
+    File.delete("ficheiros gerados/2_site_#{@site}.csv") if File.exist?("ficheiros gerados/2_site_#{@site}.csv")
+    fileObj = File.new("ficheiros gerados/2_site_#{@site}.csv", 'a+')
+    File.open("ficheiros gerados/2_site_#{@site}.csv",'a') do |linha|
       for i in 0...num_leituras
         for j in 0...tab[0].size-1
           linha.write("#{tab[i][j]};")
@@ -110,29 +201,66 @@ class Site
     fileObj.close
   end
 
+  def concat_all_groups   # Concatenação das tabelas de consumo global, avac e it
+    tab = Array.new(@pacote_info[0])
+    for i in 0...tab.size
+      tab[i].concat(@pacote_info[1][i]).concat(@pacote_info[2][i])
+    end
+    tab
+  end
+
   def core
     num_leituras = calcula_linhas
     colunas_ref = prepara_colunas_ref
     tab = Array.new(colunas_ref) 
-    colunas_medicoes = prepara_colunas_medicoes
+    colunas_medicoes = concat_all_groups
     for i in 0...num_leituras
       tab[i].concat(colunas_medicoes[i])
     end
     cria_novo_csv(tab)
   end
-
 end
 
-sites = ["alf1p0", "alf1pmenos1", "alf2a1", "alf2a7a8", "bvtp1", "bvtp0", "avr", "cmb", "far", "fmc", "fnc", "mat", "pdg", "ptm", "snt", "ran"]
-groups = Site.indicators_groups_globais
-for i in 0...sites.size
-  sites[i] = Site.new(sites[i], "consumo_global", groups[i])
-  sites[i].core
+def corre_vsites
+  sites = ["alf1p0",
+           "alf1p-1",
+           "alf2a1",
+           "alf2a7a8",
+           "bvtp1",
+           "bvtp0",
+           "avr",
+           "cmb",
+           "far",
+           "fmc",
+           "fnc",
+           "mat",
+           "pdg",
+           "ptm",
+           "snt",
+           "ran"]
+ 
+    groups_globais = Site.indicators_groups_globais
+    groups_avac = Site.indicators_groups_avac
+    groups_it = Site.indicators_groups_it
+    
+    for i in 0...sites.size
+      nome = "globais_#{sites[i]}"
+      nome = Site.new("consumo_global", groups_globais[i])
+      tab_global = nome.trata_informacao
+
+      nome = "avac_#{sites[i]}"
+      nome = Site.new("avac", groups_avac[i])
+      tab_avac = nome.trata_informacao
+
+      nome = "it_#{sites[i]}"
+      nome = Site.new("it", groups_it[i])
+      tab_it = nome.trata_informacao
+
+      sites[i] = Contatena.new(sites[i], [tab_global, tab_avac, tab_it], "consumo_global")
+      sites[i].core
+      count = (((i.to_f+1)/16)*100).round(0)
+      puts "status..#{count}%"
+    end
 end
 
-
-#EA+ AVAC DTCs (KWh);EA+ AVAC IT ALF1P0 (KWh);EA+ AVAC IT BVTP1 (KWh);EA+ AVAC IT ALF2A1 (KWh);EA+ AVAC IT ALF2A7+A8 (KWh);EA+ AVAC OMCs (KWh);EA+ AVAC PDG (KWh);EA+ AVAC IT ALF1P-1 (KWh);EA+ AVAC IT SNT (KWh);EA+ AVAC CMB (KWh);EA+ AVAC FNC (KWh);EA+ AVAC IT FAR (KWh);EA+ AVAC IT BVTP0 (KWh);EA+ AVAC FMC (KWh);EA+ AVAC RAN (KWh);EA+ AVAC IT PTM (KWh);EA+ AVAC IT MAT (KWh);EA+ AVAC AVR (KWh)
-
-
-
-
+#corre_vsites
