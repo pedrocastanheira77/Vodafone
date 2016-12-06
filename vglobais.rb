@@ -1,4 +1,4 @@
-require_relative "vfuncoes.rb"
+require_relative "vhelperFicheiros.rb"
 
 class Globais
   def initialize(tipo, generico, ficheiros)
@@ -8,16 +8,13 @@ class Globais
   end
 
   def prepara_colunas_ref
-      ficheiro = LeFicheiro.new("#{@ficheiros[0]}", 3)
-      dados = ficheiro.leitura
+      dados = Ficheiro.leitura("#{@ficheiros[0]}", 3)
       colunas_ref = []
       linha = []
-      
       for j in 0..4 # Cabecalho
         linha.push(dados[0][j])
       end
       colunas_ref.push(linha)
-
       for i in 1...dados.size # Entradas
         linha = []
         for j in 0..4
@@ -30,8 +27,7 @@ class Globais
   end
 
   def prepara_colunas_medicoes(ficheiro)
-    ficheiro = LeFicheiro.new(ficheiro, 3)
-    dados = ficheiro.leitura
+    dados = Ficheiro.leitura(ficheiro, 3)
     for i in 0...dados.size
       6.times do
         dados[i].shift
@@ -40,12 +36,10 @@ class Globais
     indicadores = dados[0].size
     colunas = []
     linha = []
-
     for j in 0...indicadores
       linha.push(dados[0][j])
     end
     colunas.push(linha)
-
     for i in 1...dados.size
       linha = []
       for j in 0...indicadores
@@ -58,6 +52,7 @@ class Globais
 
   def core
     colunas_ref = prepara_colunas_ref
+    num_colunas_ref = colunas_ref[0].size
     tabela = Array.new(colunas_ref)
     for num_ficheiros in 0...@ficheiros.size
       colunas_medicoes = []
@@ -66,19 +61,20 @@ class Globais
           tabela[i].concat(colunas_medicoes[i])
         end
     end
-    EscreveFicheiro.cria_csv(tabela, "ficheiros gerados/1_analise_#{@generico}.csv")
+    Ficheiro.cria_csv(tabela, "ficheiros gerados/1.1_analise_#{@generico}.csv", num_colunas_ref)
   end
-
 end
 
-def corre_vglobais(fich_globais, fich_avac, fich_it)
-  global = Globais.new("global", "consumo_global", fich_globais)
-  global.core
-  puts "status..33%"
-  avac = Globais.new("AVAC", "avac", fich_avac)
-  avac.core
-  puts "status..66%"
-  it = Globais.new("IT", "it", fich_it)
-  it.core
-  puts "status..100%"
+def corre_vglobais(ficheiros)
+  categorias = [["TOTAL", "consumo_total", ficheiros[0]],
+                ["AVAC", "avac", ficheiros[1]],
+                ["IT", "it", ficheiros[2]]]
+  for i in 0...categorias.size
+    nome = categorias[i][1]
+    nome = Globais.new(categorias[i][0], categorias[i][1], categorias[i][2])
+    nome.core
+    puts "status..#{(i+1)*100/categorias.size}%"
+  end
 end
+
+#corre_vglobais

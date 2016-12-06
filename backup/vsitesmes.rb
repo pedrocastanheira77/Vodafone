@@ -5,7 +5,7 @@ class SiteMes
   end
 
   def calcula_linhas
-    fileObj = File.open("ficheiros gerados/2_site_#{@site}.csv")
+    fileObj = File.open("ficheiros gerados/1.2_site_#{@site}.csv")
     count = fileObj.read.count("\n")
     fileObj.close
     return count
@@ -36,7 +36,7 @@ class SiteMes
 
   def leituras
     num_leituras = calcula_linhas
-    fileObj = File.open("ficheiros gerados/2_site_#{@site}.csv")
+    fileObj = File.open("ficheiros gerados/1.2_site_#{@site}.csv")
     linhas=[]
     for i in 0...num_leituras
       entrada = fileObj.gets.split("\n")
@@ -91,9 +91,9 @@ class SiteMes
 
   def cria_novo_csv(tab)
     num_leituras = 13
-    File.delete("ficheiros gerados/3_site_mensal_#{@site}.csv") if File.exist?("ficheiros gerados/3_site_mensal_#{@site}.csv")
-    fileObj = File.new("ficheiros gerados/3_site_mensal_#{@site}.csv", 'a+')
-    File.open("ficheiros gerados/3_site_mensal_#{@site}.csv",'a') do |linha|
+    File.delete("ficheiros gerados/1.3_site_mensal_#{@site}.csv") if File.exist?("ficheiros gerados/1.3_site_mensal_#{@site}.csv")
+    fileObj = File.new("ficheiros gerados/1.3_site_mensal_#{@site}.csv", 'a+')
+    File.open("ficheiros gerados/1.3_site_mensal_#{@site}.csv",'a') do |linha|
       for i in 0...num_leituras
         for j in 0...tab[0].size-1
           linha.write("#{tab[i][j]};")
@@ -144,6 +144,8 @@ def corre_vsitesmes
     nome = "mensal_#{sites[i]}"
     nome = SiteMes.new(sites[i])
     nome.core
+    count = (((i.to_f+1)/16)*100).round(0)
+    puts "status..#{count}%"
   end
 end
 

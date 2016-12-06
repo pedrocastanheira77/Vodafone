@@ -1,33 +1,68 @@
 require_relative "vglobais.rb"
 require_relative "vsites.rb"
 require_relative "vsitesmes.rb"
+require_relative "vsitestrimestre.rb"
 require_relative "vtarifas.rb"
 require_relative "vtarifasmes.rb"
+require_relative "vreport_cap2.rb"
+require_relative "vreport_cap7.1_e_2.rb"
+require_relative "vreport_cap7.3.rb"
 require_relative "vfuncoes.rb"
 
 system "cls"
 lineWidth = 15
 
-#### Procura na diretoria os ficheiros que vai utilizar ################################################
+puts "Preparando ficheiros".ljust(lineWidth)
 ficheiroswm = corre_vfiles
-puts "Files".ljust(lineWidth) + "ok (100%)".rjust(lineWidth)
+puts "Terminado!".ljust(lineWidth)
+puts
 
-#### Gera ficheiros com os consumos globais ################################################
-corre_vglobais(ficheiroswm[0], ficheiroswm[1], ficheiroswm[2])
-puts "Globais".ljust(lineWidth) + "ok (100%)".rjust(lineWidth)
+puts "Geracao de ficheiros de consumos globais".ljust(lineWidth)
+corre_vglobais(ficheiroswm)
+puts "Terminado!".ljust(lineWidth)
+puts
 
-#### Gera ficheiros com os consumos por site ################################################
+puts "Preparando ficheiros de consumo por site".ljust(lineWidth)
 corre_vsites
-puts "Sites".ljust(lineWidth) + "ok (100%)".rjust(lineWidth)
+puts "Terminado!".ljust(lineWidth)
+puts
 
-#### Gera ficheiros com os consumos mensais por site ################################################
+puts "Preparando ficheiros de consumo mensais por site".ljust(lineWidth)
 corre_vsitesmes
-puts "Sites por mes".ljust(lineWidth) + "ok (100%)".rjust(lineWidth)
+puts "Terminado!".ljust(lineWidth)
+puts
 
-#### Gera ficheiros com os custos por site ################################################
+puts "Preparando ficheiros de custos trimestrais por site".ljust(lineWidth)
+corre_vsitestrimestre
+puts "Terminado!".ljust(lineWidth)
+puts
+
+puts "Preparando ficheiros de custos por site".ljust(lineWidth)
 corre_vtarifas
-puts "Custos por site".ljust(lineWidth) + "ok (100%)".rjust(lineWidth)
+puts "Terminado!".ljust(lineWidth)
+puts
 
-#### Gera ficheiros com os custos mensais por site ################################################
+puts "Preparando ficheiros de custos mensais por site".ljust(lineWidth)
 corre_vtarifasmes
-puts "Custos por site por mês".ljust(lineWidth) + "ok (100%)".rjust(lineWidth)
+puts "Terminado!".ljust(lineWidth)
+puts
+
+puts "Preparando tabelas para Capitulo 2...".ljust(lineWidth)
+corre_vcap_2
+puts "Terminado!".ljust(lineWidth)
+puts
+
+puts "Preparando tabela para Capitulo 7.1 e 7.2...".ljust(lineWidth)
+corre_vcap_71_72
+puts "Terminado!".ljust(lineWidth)
+puts
+
+puts "Preparando tabela para Capitulo 7.3...".ljust(lineWidth)
+corre_vcap_73
+puts "Terminado!".ljust(lineWidth)
+puts
+
+puts "Preparando tabela para Capitulo 7.4...".ljust(lineWidth)
+corre_vcap_74_consumo_energia
+puts "Terminado!".ljust(lineWidth)
+puts

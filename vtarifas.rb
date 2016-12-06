@@ -31,7 +31,7 @@ class Tarifas
   def prepara_colunas_consumo
     colunas_ref = Tarifas.prepara_colunas_ref
     linhas_colunas_ref = colunas_ref.size
-    ficheiro = LeFicheiro.new("ficheiros gerados/2_site_#{@site}.csv", 0)
+    ficheiro = LeFicheiro.new("ficheiros gerados/1.2_site_#{@site}.csv", 0)
     dados = ficheiro.leitura
     consumo = []
     consumo = [["EA+ Geral (kWh)"]]
@@ -174,6 +174,7 @@ class Tarifas
   end
 
   def calcula_custo
+    num_colunas_ref = 5
     custos_unitarios = atribuicao_custo
     soma = [["Energia Total", "Energia Redes Total", "Total"]]
     for i in 1...custos_unitarios.size
@@ -183,7 +184,7 @@ class Tarifas
       soma[i] = [soma_energia.round(2), soma_redes.round(2), total.round(2)]
     end
     tabela = ConcatenaTabelas.concat(custos_unitarios, soma)
-    EscreveFicheiro.cria_csv(tabela, "ficheiros gerados/4_tarifas_#{@site}.csv")
+    EscreveFicheiro.cria_csv(tabela, "ficheiros gerados/2.1_tarifas_#{@site}.csv", num_colunas_ref)
   end
 
 end
@@ -199,3 +200,4 @@ def corre_vtarifas
   end
 end
 
+#corre_vtarifas

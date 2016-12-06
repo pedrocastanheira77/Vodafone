@@ -1,6 +1,9 @@
+require_relative "vfuncoes.rb"
+
 class Site
 
-  def initialize(ficheiro, indicadores)
+  def initialize(site, ficheiro, indicadores)
+    @site = site
     @ficheiro = ficheiro
     @indicadores = indicadores
   end
@@ -67,16 +70,16 @@ class Site
     ["EA+ IT RAN (KWh)"]
     ]
   end
-
+  
   def calcula_linhas
-    fileObj = File.open("ficheiros gerados/1_analise_#{@ficheiro}.csv")
+    fileObj = File.open("ficheiros gerados/1.1_analise_#{@ficheiro}.csv")
     count = fileObj.read.count("\n")
     fileObj.close
     return count
   end
 
   def get_index
-    fileObj = File.open("ficheiros gerados/1_analise_#{@ficheiro}.csv")
+    fileObj = File.open("ficheiros gerados/1.1_analise_#{@ficheiro}.csv")
     cabecalho = fileObj.gets.chomp
     cabecalho = cabecalho.split(";")
     index_table = []
@@ -88,7 +91,7 @@ class Site
 
   def leituras
     num_leituras = calcula_linhas
-    fileObj = File.open("ficheiros gerados/1_analise_#{@ficheiro}.csv")
+    fileObj = File.open("ficheiros gerados/1.1_analise_#{@ficheiro}.csv")
     linhas=[]
     for i in 0...num_leituras
       entrada = fileObj.gets.split("\n")
@@ -125,7 +128,7 @@ class Site
     tab = prepara_colunas_medicoes
     if @indicadores.size > 1
       array_soma = []
-      array_soma[0] = ["EA+ Geral (kWh)"]
+      array_soma[0] = ["EA+ Geral #{@site.upcase} (kWh)"]
       for i in 1...tab.size
         linha = []
         res = 0
@@ -153,7 +156,7 @@ class Contatena
   end
 
   def calcula_linhas
-    fileObj = File.open("ficheiros gerados/1_analise_consumo_global.csv")
+    fileObj = File.open("ficheiros gerados/1.1_analise_consumo_global.csv")
     count = fileObj.read.count("\n")
     fileObj.close
     return count
@@ -161,7 +164,7 @@ class Contatena
 
   def leituras_colunas_ref
     num_leituras = calcula_linhas
-    fileObj = File.open("ficheiros gerados/1_analise_consumo_global.csv")
+    fileObj = File.open("ficheiros gerados/1.1_analise_consumo_global.csv")
     linhas=[]
     for i in 0...num_leituras
       entrada = fileObj.gets.split("\n")
@@ -169,7 +172,7 @@ class Contatena
       linhas.push(entrada)
     end
     fileObj.close
-    return linhas
+    linhas
   end
 
   def prepara_colunas_ref   # como referência usa-se o ficheiro dos consumos globais para obter as colunas fixas (data, hora, ...)
@@ -188,9 +191,9 @@ class Contatena
 
   def cria_novo_csv(tab)
     num_leituras = calcula_linhas
-    File.delete("ficheiros gerados/2_site_#{@site}.csv") if File.exist?("ficheiros gerados/2_site_#{@site}.csv")
-    fileObj = File.new("ficheiros gerados/2_site_#{@site}.csv", 'a+')
-    File.open("ficheiros gerados/2_site_#{@site}.csv",'a') do |linha|
+    File.delete("ficheiros gerados/1.2_site_#{@site}.csv") if File.exist?("ficheiros gerados/1.2_site_#{@site}.csv")
+    fileObj = File.new("ficheiros gerados/1.2_site_#{@site}.csv", 'a+')
+    File.open("ficheiros gerados/1.2_site_#{@site}.csv",'a') do |linha|
       for i in 0...num_leituras
         for j in 0...tab[0].size-1
           linha.write("#{tab[i][j]};")
@@ -222,43 +225,29 @@ class Contatena
 end
 
 def corre_vsites
-  sites = ["alf1p0",
-           "alf1p-1",
-           "alf2a1",
-           "alf2a7a8",
-           "bvtp1",
-           "bvtp0",
-           "avr",
-           "cmb",
-           "far",
-           "fmc",
-           "fnc",
-           "mat",
-           "pdg",
-           "ptm",
-           "snt",
-           "ran"]
- 
-    groups_globais = Site.indicators_groups_globais
-    groups_avac = Site.indicators_groups_avac
-    groups_it = Site.indicators_groups_it
-    
-    for i in 0...sites.size
-      nome = "globais_#{sites[i]}"
-      nome = Site.new("consumo_global", groups_globais[i])
-      tab_global = nome.trata_informacao
+  sites = sites = ListaSites.lista_sites
+  groups_globais = Site.indicators_groups_globais
+  groups_avac = Site.indicators_groups_avac
+  groups_it = Site.indicators_groups_it
+  
+  for i in 0...sites.size
+    nome = "globais_#{sites[i]}"
+    nome = Site.new(sites[i],"consumo_global", groups_globais[i])
+    tab_global = nome.trata_informacao
 
-      nome = "avac_#{sites[i]}"
-      nome = Site.new("avac", groups_avac[i])
-      tab_avac = nome.trata_informacao
+    nome = "avac_#{sites[i]}"
+    nome = Site.new(sites[i], "avac", groups_avac[i])
+    tab_avac = nome.trata_informacao
 
-      nome = "it_#{sites[i]}"
-      nome = Site.new("it", groups_it[i])
-      tab_it = nome.trata_informacao
+    nome = "it_#{sites[i]}"
+    nome = Site.new(sites[i], "it", groups_it[i])
+    tab_it = nome.trata_informacao
 
-      sites[i] = Contatena.new(sites[i], [tab_global, tab_avac, tab_it], "consumo_global")
-      sites[i].core
-    end
+    sites[i] = Contatena.new(sites[i], [tab_global, tab_avac, tab_it], "consumo_global")
+    sites[i].core
+    count = (((i.to_f+1)/16)*100).round(0)
+    puts "status..#{count}%"
+  end
 end
 
 #corre_vsites
