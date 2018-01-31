@@ -1,7 +1,7 @@
 require_relative "vfuncoes.rb"
 
 class Tarifas
-  
+
   def initialize(site)
     @site = site
   end
@@ -13,15 +13,16 @@ class Tarifas
 
       linha = []
       for j in 0..4
-        linha.push(dados[0][j])
+        linha << dados[0][j].strip
       end
-      colunas_ref.push(linha)
+
+      colunas_ref << linha
 
       for i in 1...dados.size
         linha = []
         for j in 0..4
-          linha.push(dados[i][j]) if (j==0 || j==4)
-          linha.push(dados[i][j].sub(/,/,".").to_f) if (j == 1 || j==2 || j==3)
+          linha << dados[i][j].strip if (j==0 || j==4)
+          linha << dados[i][j].sub(/,/,".").to_f if (j == 1 || j==2 || j==3)
         end
         colunas_ref.push(linha)
       end
@@ -51,7 +52,7 @@ class Tarifas
     consumo = prepara_colunas_consumo
     tabela = ConcatenaTabelas.concat(colunas_ref, consumo)
   end
-  
+
   def atribuicao_sazonalidade
     tabela = concatena
     sazonalidade = [["Sazonalidade"]]
@@ -71,7 +72,7 @@ class Tarifas
       end
     end
     tabela = ConcatenaTabelas.concat(tabela, sazonalidade)
-  end 
+  end
 
   def atribuicao_periodo
     sazonalidade = atribuicao_sazonalidade
@@ -96,7 +97,7 @@ class Tarifas
           periodos[i] = ["super-vazio"] if verao[3].include? sazonalidade[i][4]
         end
       end
-   
+
     elsif ciclo.downcase == "semanal"
       matriz = PeriodosHorarios.ciclo_semanal
       dias_uteis = ["Mon","Tue","Wed","Thu","Fri"]
@@ -141,7 +142,7 @@ class Tarifas
           periodos[i] = ["super-vazio"] if verao_dias_dom[3].include? sazonalidade[i][4]
         end
       end
-          
+
     end
     tabela = ConcatenaTabelas.concat(sazonalidade, periodos)
   end
@@ -200,4 +201,4 @@ def corre_vtarifas
   end
 end
 
-#corre_vtarifas
+# corre_vtarifas

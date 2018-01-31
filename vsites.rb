@@ -13,18 +13,18 @@ class Site
     ["EA+ QGD 1 ALF1P0 (KWh)", "EA+ QGD 2 ALF1P0 (KWh)"],
     ["EA+ QGD 1 ALF1P-1 (KWh)","EA+ QGD 2 ALF1P-1 (KWh)"],
     ["EA+ QGD 1 ALF2A1 (KWh)"],
-    ["EA+ Geral ALF2A7+A8 (KWh)"],
+    ["EA+ QGBT PT ALF2A7+A8 (KWh)"],
     ["EA+ GERAL 1 BVTP1 (KWh)", "EA+ GERAL 2 BVTP1 (KWh)"],
     ["EA+ BVTP0 (KWh)"],
     ["EA+ GERAL AVR (KWh)"],
     ["EA+ GERAL CMB (KWh)"],
-    ["EA+ GERAL FAR (KWh)"],
+    ["EA+ Q.INV 1 FAR (KWh)"],
     ["EA+ GERAL FMC (KWh)"],
     ["EA+ Q.INV1 FNC (KWh)"],
-    ["EA+ GERAL MAT (KWh)"],
+    ["EA+ Q.INV1 MAT (KWh)"],
     ["EA+ GERAL PDG (KWh)"],
-    ["EA+ GERAL PTM (KWh)"],
-    ["EA+ GERAL 1 SNT (KWh)", "EA+ GERAL 2 SNT (KWh)"],
+    ["EA+ QGD 1 PTM (KWh)"],
+    ["EA+ Q.INV 1 SNT (KWh)", "EA+ Q.INV 2 SNT (KWh)"],
     ["EA+ GERAL 1 RAN (KWh)", "EA+ GERAL 2 RAN (KWh)"]
     ]
   end
@@ -37,16 +37,16 @@ class Site
     ["EA+ AVAC IT ALF2A7+A8 (KWh)"],
     ["EA+ AVAC IT BVTP1 (KWh)"],
     ["EA+ AVAC IT BVTP0 (KWh)"],
-    ["EA+ AVAC AVR (KWh)"],
+    ["EA+ AVAC IT AVR (KWh)"],
     ["EA+ AVAC CMB (KWh)"],
     ["EA+ AVAC IT FAR (KWh)"],
     ["EA+ AVAC FMC (KWh)"],
     ["EA+ AVAC FNC (KWh)"],
     ["EA+ AVAC IT MAT (KWh)"],
-    ["EA+ AVAC PDG (KWh)"],
+    ["EA+ AVAC IT PDG (KWh)"],
     ["EA+ AVAC IT PTM (KWh)"],
     ["EA+ AVAC IT SNT (KWh)"],
-    ["EA+ AVAC RAN (KWh)"]
+    ["EA+ AVAC IT RAN (KWh)"]
     ]
   end
 
@@ -99,7 +99,7 @@ class Site
       linhas.push(entrada)
     end
     fileObj.close
-    return linhas
+    linhas
   end
 
   def prepara_colunas_medicoes
@@ -135,7 +135,7 @@ class Site
         for j in 0...tab[0].size
           res += tab[i][j]
         end
-        linha.push(res)
+        linha << res
         array_soma.push(linha)
       end
       return array_soma
@@ -225,7 +225,7 @@ class Contatena
 end
 
 def corre_vsites
-  sites = sites = ListaSites.lista_sites
+  sites = ListaSites.lista_sites
   groups_globais = Site.indicators_groups_globais
   groups_avac = Site.indicators_groups_avac
   groups_it = Site.indicators_groups_it

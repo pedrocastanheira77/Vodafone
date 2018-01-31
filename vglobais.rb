@@ -8,7 +8,7 @@ class Globais
   end
 
   def prepara_colunas_ref
-      dados = Ficheiro.leitura("#{@ficheiros[0]}", 3)
+      dados = Ficheiro.leitura("#{@ficheiros[0]}", 7)
       colunas_ref = []
       linha = []
       for j in 0..4 # Cabecalho
@@ -27,7 +27,7 @@ class Globais
   end
 
   def prepara_colunas_medicoes(ficheiro)
-    dados = Ficheiro.leitura(ficheiro, 3)
+    dados = Ficheiro.leitura(ficheiro, 7)
     for i in 0...dados.size
       6.times do
         dados[i].shift
@@ -37,7 +37,7 @@ class Globais
     colunas = []
     linha = []
     for j in 0...indicadores
-      linha.push(dados[0][j])
+      j == indicadores-1 ? linha << dados[0][j].strip : linha << dados[0][j]
     end
     colunas.push(linha)
     for i in 1...dados.size
@@ -70,7 +70,7 @@ def corre_vglobais(ficheiros)
                 ["AVAC", "avac", ficheiros[1]],
                 ["IT", "it", ficheiros[2]]]
   for i in 0...categorias.size
-    nome = categorias[i][1]
+    # nome = categorias[i][1]
     nome = Globais.new(categorias[i][0], categorias[i][1], categorias[i][2])
     nome.core
     puts "status..#{(i+1)*100/categorias.size}%"

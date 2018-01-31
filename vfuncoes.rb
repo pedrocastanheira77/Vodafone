@@ -164,14 +164,15 @@ class FilesWM
 end
 
 def corre_vfiles
-  chaves = [["ea+_dtcs_K_15_minutes", "ea+_omcs_K_15_minutes"],
-            ["ea+_avac_dtcs_K_15_minutes", "ea+_avac_omcs_K_15_minutes"],
-            ["ea+_it_dtcs_K_15_minutes", "ea+_it_omcs_K_15_minutes"]
+  chaves = [["ea+_dtcs_realtime_15_minutes", "ea+_omcs_realtime_15_minutes"],
+            ["ea+_avac_dtcs_realtime_15_minutes", "ea+_avac_omcs_report_realtime_15_minutes"],
+            ["ea+_it_dtcs_realtime_15_minutes", "ea+_it_omcs_realtime_15_minutes"]
            ]
   globais = FilesWM.new(chaves[0])
   avac = FilesWM.new(chaves[1])
   it = FilesWM.new(chaves[2])
-  files = [globais.corresponde, avac.corresponde, it.corresponde]
+
+  [globais.corresponde, avac.corresponde, it.corresponde]
 end
 
 class LeFicheiro
