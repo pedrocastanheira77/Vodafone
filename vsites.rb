@@ -11,7 +11,7 @@ class Site
   def self.indicators_groups_globais
     [
     ["EA+ QGD 1 ALF1P0 (KWh)", "EA+ QGD 2 ALF1P0 (KWh)"],
-    ["EA+ QGD 1 ALF1P-1 (KWh)","EA+ QGD 2 ALF1P-1 (KWh)"],
+    ["EA+ QGD 1 ALF1P-1 (KWh)","EA+ QGD 2 ALF1P-1 (KWh)","EA+ QGD3 ALF1P-1 (KWh)","EA+ QGD4 ALF1P-1 (KWh)"],
     ["EA+ QGD 1 ALF2A1 (KWh)"],
     ["EA+ QGBT PT ALF2A7+A8 (KWh)"],
     ["EA+ GERAL 1 BVTP1 (KWh)", "EA+ GERAL 2 BVTP1 (KWh)"],

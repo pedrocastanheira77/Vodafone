@@ -1,5 +1,5 @@
 ficheiros_energia_global = [
-"ea+_dtcs_K_15_minutes_realtime_with_components_from_2016_04_01_to_2016_09_30.csv", 
+"ea+_dtcs_K_15_minutes_realtime_with_components_from_2016_04_01_to_2016_09_30.csv",
 "ea+_omcs_K_15_minutes_realtime_with_components_from_2016_04_01_to_2016_09_30.csv"
 ]
 
@@ -9,7 +9,7 @@ ficheiros_AVAC = [
 ]
 
 ALF1P0 = ["EA+ QGD 1 ALF1P0 (KWh)", "EA+ QGD 2 ALF1P0 (KWh)"]
-ALF1PMENOS1 = ["EA+ QGD 1 ALF1P-1 (KWh)","EA+ QGD 2 ALF1P-1 (KWh)"]
+ALF1PMENOS1 = ["EA+ QGD 1 ALF1P-1 (KWh)","EA+ QGD 2 ALF1P-1 (KWh)","EA+ QGD3 ALF1P-1 (KWh)","EA+ QGD4 ALF1P-1 (KWh)"]
 ALF2A1 = ["EA+ QGD 1 ALF2A1 (KWh)"]
 ALF2A7A8 = ["EA+ Geral ALF2A7+A8 (KWh)"]
 BVTP1 = ["EA+ GERAL 1 BVTP1 (KWh)", "EA+ GERAL 2 BVTP1 (KWh)"]
@@ -119,4 +119,3 @@ def core(ficheiro_ref, ficheiros_energia_global)
   num_colunas_tab = tab[0].size
   cria_novo_csv(generico, tab, num_linhas, num_colunas_tab)
 end
-
