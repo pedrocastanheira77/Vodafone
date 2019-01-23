@@ -1,6 +1,9 @@
 require_relative "vhelperFicheiros.rb"
 
 class Globais
+  DATETIME_COLUMNS = 5
+  OFFSITE_LINES = 11
+
   def initialize(tipo, generico, ficheiros)
     @tipo = tipo
     @generico = generico
@@ -8,7 +11,7 @@ class Globais
   end
 
   def prepara_colunas_ref
-      dados = Ficheiro.leitura("#{@ficheiros[0]}", 7)
+      dados = Ficheiro.leitura("#{@ficheiros[0]}", OFFSITE_LINES)
       colunas_ref = []
       linha = []
       for j in 0..4 # Cabecalho
@@ -27,9 +30,11 @@ class Globais
   end
 
   def prepara_colunas_medicoes(ficheiro)
-    dados = Ficheiro.leitura(ficheiro, 7)
+    dados = Ficheiro.leitura(ficheiro, OFFSITE_LINES)
+
+    # Remove datetime columns
     for i in 0...dados.size
-      6.times do
+      DATETIME_COLUMNS.times do
         dados[i].shift
       end
     end

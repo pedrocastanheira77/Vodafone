@@ -12,7 +12,6 @@ require_relative "vreport_cap7.1_e_2.rb"
 require_relative "vreport_cap7.3.rb"
 require_relative "vreport_cap7.4.rb"
 require_relative "vreport_cap7.5.rb"
-#require_relative "vfuncoes.rb"
 
 system "cls"
 lineWidth = 15
